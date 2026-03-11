@@ -1,0 +1,352 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(160deg, #2D0410 0%, #6B0E22 40%, #A8253E 70%, #C4384F 100%);
+  overflow: hidden;
+  padding: 120px 0 80px;
+}
+
+/* ===== BLOBS ===== */
+.blobPrimary {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  top: -100px;
+  right: -100px;
+  background: radial-gradient(circle, rgba(196, 56, 79, 0.4) 0%, transparent 70%);
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: blob 10s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.blobSecondary {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  bottom: 0;
+  left: -80px;
+  background: radial-gradient(circle, rgba(139, 26, 47, 0.5) 0%, transparent 70%);
+  border-radius: 40% 60% 70% 30% / 50% 60% 30% 60%;
+  animation: blob 12s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+.blobTertiary {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  top: 40%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: blob 8s ease-in-out infinite 2s;
+  pointer-events: none;
+}
+
+/* ===== PARTICLES ===== */
+.particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  animation: particle-float linear infinite;
+  pointer-events: none;
+}
+
+/* ===== GRID ===== */
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* ===== CONTENT ===== */
+.content {
+  position: relative;
+  z-index: 10;
+  max-width: 640px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(10px);
+  margin-bottom: 28px;
+}
+
+.badgeDot {
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+}
+
+.headline {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 900;
+  color: white;
+  line-height: 1.08;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+}
+
+.headlineAccent {
+  background: linear-gradient(135deg, #FAE0E4, #F2B5BE, #E88898);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subheadline {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.7;
+  margin-bottom: 40px;
+  max-width: 520px;
+  font-weight: 400;
+}
+
+.ctaGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 56px;
+}
+
+.ctaGroup .btn-secondary {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.ctaGroup .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.stats {
+  display: flex;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statValue {
+  font-family: 'Outfit', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* ===== FLOATING FEATURE CARDS ===== */
+.floatingCards {
+  position: absolute;
+  right: 4%;
+  bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 10;
+}
+
+.floatingCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  animation: float 5s ease-in-out infinite;
+}
+
+.floatingIcon {
+  font-size: 20px;
+}
+
+.floatingLabel {
+  white-space: nowrap;
+}
+
+/* ===== VISUAL ORB ===== */
+.visualWrapper {
+  position: absolute;
+  right: 8%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+.visualOrb {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbInner {
+  position: relative;
+  z-index: 10;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 40px rgba(255,255,255,0.15), 0 0 80px rgba(196,56,79,0.3);
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.orbRing1, .orbRing2, .orbRing3 {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  animation: spin-slow linear infinite;
+}
+
+.orbRing1 {
+  width: 160px;
+  height: 160px;
+  animation-duration: 12s;
+  border-color: rgba(255,255,255,0.2);
+}
+
+.orbRing2 {
+  width: 200px;
+  height: 200px;
+  animation-duration: 18s;
+  animation-direction: reverse;
+}
+
+.orbRing3 {
+  width: 240px;
+  height: 240px;
+  animation-duration: 25s;
+  border-color: rgba(255,255,255,0.08);
+}
+
+.orbitDot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  transform: rotate(var(--deg)) translateX(80px) translateY(-4px);
+  box-shadow: 0 0 8px rgba(255,255,255,0.8);
+}
+
+/* ===== MINI CARDS ===== */
+.miniCard {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #450618;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  white-space: nowrap;
+}
+
+.miniCardDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.miniCard1 { top: -30px; left: -140px; }
+.miniCard2 { bottom: -20px; right: -120px; }
+.miniCard3 { top: 50%; transform: translateY(-50%); left: -160px; }
+
+/* ===== WAVE DIVIDER ===== */
+.waveDivider {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.waveDivider svg {
+  width: 100%;
+  height: 80px;
+}
+
+@media (max-width: 768px) {
+  .visualWrapper { display: none; }
+  .floatingCards { display: none; }
+  .content { max-width: 100%; }
+}
+
+@keyframes blob {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  50% { border-radius: 50% 60% 30% 60% / 40% 30% 70% 60%; }
+  75% { border-radius: 40% 60% 70% 30% / 60% 40% 30% 70%; }
+}
+
+@keyframes particle-float {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 30px rgba(255,255,255,0.15), 0 0 60px rgba(196,56,79,0.3); }
+  50% { box-shadow: 0 0 50px rgba(255,255,255,0.25), 0 0 100px rgba(196,56,79,0.5); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
