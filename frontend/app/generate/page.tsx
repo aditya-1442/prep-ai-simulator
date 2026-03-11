@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Sparkles, Brain, FileText,
@@ -8,16 +9,17 @@ import {
   ListOrdered, MessageSquare, Send, ChevronRight,
   Terminal, BookOpen, User, Briefcase, Layout, Code2, AlertTriangle
 } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import Navbar from '@/components/Navbar/Navbar'
 import styles from './page.module.css'
-import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
 import { javascript } from '@codemirror/lang-javascript'
 import { cpp } from '@codemirror/lang-cpp'
 import { java } from '@codemirror/lang-java'
 import { oneDark } from '@codemirror/theme-one-dark'
+
+const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), { ssr: false })
+const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false })
+import remarkGfm from 'remark-gfm'
 
 const languageExtensions = {
   python: python(),
@@ -64,10 +66,6 @@ export default function EnginePage() {
   const [error, setError] = useState<string | null>(null)
   const [companies, setCompanies] = useState<string[]>([])
   const chatEndRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    fetch(`${API_BASE}/api/companies`).then(res => res.json()).then(setCompanies).catch(() => {})
-  }, [])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })

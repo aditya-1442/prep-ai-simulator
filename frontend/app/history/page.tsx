@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Clock, HelpCircle, FileText, Search, Brain, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
+const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false })
 import Navbar from '@/components/Navbar/Navbar'
 import styles from './page.module.css'
 
