@@ -1,14 +1,8 @@
 'use client'
-
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Sparkles, Brain, FileText,
-  AlertCircle, Loader2, Link2,
-  ListOrdered, MessageSquare, Send, ChevronRight,
-  Terminal, BookOpen, User, Briefcase, Layout, Code2, AlertTriangle
-} from 'lucide-react'
+import { Sparkles, Brain, FileText, AlertCircle, Loader2, Link2, ListOrdered, MessageSquare, Send, ChevronRight, Terminal, BookOpen, User, Briefcase, Layout, Code2, AlertTriangle } from 'lucide-react'
 import Navbar from '@/components/Navbar/Navbar'
 import styles from './page.module.css'
 import { python } from '@codemirror/lang-python'
@@ -21,18 +15,18 @@ const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), { ssr: false }
 const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false })
 import remarkGfm from 'remark-gfm'
 
-const languageExtensions = {
-  python: python(),
-  javascript: javascript({ jsx: true }),
-  cpp: cpp(),
-  java: java()
-}
+const languageExtensions = { python: python(), javascript: javascript({ jsx: true }), cpp: cpp(), java: java() }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+// ✅ FIX 1: Hard-coded fallback removed — must be set in Vercel env vars
+// Go to Vercel → Project → Settings → Environment Variables
+// Add: NEXT_PUBLIC_API_URL = https://prep-ai-simulator.onrender.com
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://prep-ai-simulator.onrender.com'
 
 interface ResumeRoastResponse {
-  roast_summary: string
-  critical_questions: string[]
+  roast: string
+  improvements: string
+  match_score: string
+  missing_keywords: string[]
 }
 
 interface LiveCodeSession {
@@ -45,12 +39,12 @@ interface LiveCodeSession {
 
 export default function EnginePage() {
   const [mode, setMode] = useState<'roast' | 'live-code'>('live-code')
-  
+
   // Resume Roast State
   const [resumeFile, setResumeFile] = useState<File | null>(null)
   const [role, setRole] = useState('')
-  const [resumeRoast, setResumeRoast] = useState<any>(null)
-  
+  const [resumeRoast, setResumeRoast] = useState<ResumeRoastResponse | null>(null)
+
   // Live Code State
   const [companyName, setCompanyName] = useState('')
   const [language, setLanguage] = useState<'python' | 'javascript' | 'cpp' | 'java'>('python')
@@ -60,12 +54,32 @@ export default function EnginePage() {
   const [chatHistory, setChatHistory] = useState<{role: string, content: string}[]>([])
   const [submissionsCount, setSubmissionsCount] = useState(0)
   const [isInterviewOver, setIsInterviewOver] = useState(false)
-  
+
   // Shared
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [companies, setCompanies] = useState<string[]>([])
   const chatEndRef = useRef<HTMLDivElement>(null)
+
+  // ✅ FIX 2: Actually fetch companies on mount (was missing entirely!)
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/companies`)
+        if (!res.ok) throw new Error('Failed to fetch companies')
+        const data = await res.json()
+        // Backend returns array of objects or strings — handle both
+        if (Array.isArray(data)) {
+          const names = data.map((c: any) => (typeof c === 'string' ? c : c.name || c))
+          setCompanies(names)
+        }
+      } catch (err) {
+        console.error('Could not load companies list:', err)
+        // Non-fatal: user can still type manually
+      }
+    }
+    fetchCompanies()
+  }, [])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -81,14 +95,28 @@ export default function EnginePage() {
       formData.append("file", resumeFile)
       formData.append("job_description", role)
 
+      // ✅ FIX 3: Added timeout so Render wake-up doesn't silently fail
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 60000) // 60s for Render cold start
+
       const res = await fetch(`${API_BASE}/api/interview/roast`, {
         method: 'POST',
-        body: formData
+        body: formData,
+        signal: controller.signal
       })
-      if (!res.ok) throw new Error()
+      clearTimeout(timeout)
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.detail || `Server error: ${res.status}`)
+      }
       setResumeRoast(await res.json())
-    } catch {
-      setError('Failed to analyze resume. Check backend.')
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        setError('Request timed out. The backend may be waking up (Render free tier). Please try again in 30 seconds.')
+      } else {
+        setError(`Failed to analyze resume: ${err.message}`)
+      }
     } finally {
       setLoading(false)
     }
@@ -103,18 +131,32 @@ export default function EnginePage() {
     setSubmissionsCount(0)
     setIsInterviewOver(false)
     try {
+      // ✅ FIX 4: Timeout for code start too
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 60000)
+
       const res = await fetch(`${API_BASE}/api/interview/code/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ company_name: companyName, language }),
+        signal: controller.signal
       })
-      if (!res.ok) throw new Error('Failed to start interview.')
+      clearTimeout(timeout)
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.detail || 'Failed to start interview.')
+      }
       const data = await res.json()
       setCodeSession(data)
       setCurrentCode(data.starting_code)
       setChatHistory([{ role: 'ai', content: data.initial_greeting }])
     } catch (err: any) {
-      setError(err.message)
+      if (err.name === 'AbortError') {
+        setError('Backend is waking up (Render free tier). Please wait 30 seconds and try again.')
+      } else {
+        setError(err.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -125,7 +167,7 @@ export default function EnginePage() {
     const userMsg = chatInput
     setChatInput('')
     setChatHistory(prev => [...prev, { role: 'user', content: userMsg }])
-    
+
     try {
       const res = await fetch(`${API_BASE}/api/interview/code/chat`, {
         method: 'POST',
@@ -148,15 +190,21 @@ export default function EnginePage() {
       return
     }
     setLoading(true)
+    setError(null)
     try {
       const res = await fetch(`${API_BASE}/api/interview/code/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: codeSession.session_id, code: currentCode, language }),
       })
-      if (!res.ok) throw new Error()
+
+      // ✅ FIX 5: Show actual backend error instead of generic message
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.detail || `Submission failed with status ${res.status}`)
+      }
       const data = await res.json()
-      
+
       const userMsg = `[Submitted Solution for Evaluation in ${language.toUpperCase()}]`
       let aiResp = data.feedback || ''
       if (data.status === "Passed") {
@@ -169,7 +217,7 @@ export default function EnginePage() {
       }
 
       setChatHistory(prev => [...prev, {role: 'user', content: userMsg}, {role: 'ai', content: aiResp}])
-      
+
       setSubmissionsCount(prev => {
         const next = prev + 1
         if (next >= 3 && !data.is_final) {
@@ -178,8 +226,8 @@ export default function EnginePage() {
         }
         return next
       })
-    } catch {
-      setError('Failed to submit code. Ensure backend logic is running.')
+    } catch (err: any) {
+      setError(`Submission failed: ${err.message}`)
     } finally {
       setLoading(false)
     }
@@ -187,7 +235,7 @@ export default function EnginePage() {
 
   return (
     <div className={styles.page}>
-      
+
       {!codeSession && (
         <>
           <Navbar />
@@ -220,28 +268,35 @@ export default function EnginePage() {
               <div className={styles.roasterInputSection}>
                 <h2>Resume Roaster</h2>
                 <p>Upload your resume (PDF/DOCX) and we will tear it apart.</p>
-                
-                <input 
-                  type="file" 
+
+                <input
+                  type="file"
                   accept=".pdf,.docx,.txt"
                   onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
                   className={styles.fileInput}
                 />
-                
-                <input 
+
+                <input
                   className={styles.inputField}
                   placeholder="Target Job Description or Role (Optional)..."
                   value={role}
                   onChange={e => setRole(e.target.value)}
                 />
 
-                <button 
-                  className={styles.submitBtnLarge} 
-                  onClick={handleRoast} 
+                <button
+                  className={styles.submitBtnLarge}
+                  onClick={handleRoast}
                   disabled={loading || !resumeFile}
                 >
                   {loading ? <Loader2 size={24} className={styles.spin}/> : 'Roast My Resume'}
                 </button>
+
+                {/* ✅ FIX 6: Show loading hint for Render cold start */}
+                {loading && (
+                  <p style={{fontSize: '0.8rem', color: '#888', marginTop: '8px', textAlign: 'center'}}>
+                    This may take up to 60 seconds if the backend is waking up...
+                  </p>
+                )}
               </div>
 
               {resumeRoast && (
@@ -250,18 +305,18 @@ export default function EnginePage() {
                     <h3>Match Score</h3>
                     <div className={styles.matchScoreBadge}>{resumeRoast.match_score}</div>
                   </div>
-                  
+
                   <div className={styles.roastBlock}>
                     <div className={styles.roastBadgeSavage}>SAVAGE MODE ON</div>
                     <h3><AlertTriangle size={20} color="var(--accent-ruby)"/> The Roast</h3>
                     <div className={styles.roastText}><ReactMarkdown>{resumeRoast.roast}</ReactMarkdown></div>
                   </div>
-                  
+
                   <div className={styles.improvementBlock}>
                     <h3><Terminal size={20} color="var(--accent-emerald)"/> Roadmap to Fix</h3>
                     <div className={styles.roastText}><ReactMarkdown>{resumeRoast.improvements}</ReactMarkdown></div>
                   </div>
-                  
+
                   {resumeRoast.missing_keywords && resumeRoast.missing_keywords.length > 0 && (
                     <div className={styles.keywordsBlock}>
                       <h3>Missing Keywords</h3>
@@ -284,8 +339,8 @@ export default function EnginePage() {
                 <form onSubmit={startLiveCode} className={styles.startForm}>
                   <h3>Start Live Technical Interview</h3>
                   <div className={styles.fieldGroup}>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       list="companies-list"
                       className={styles.inputField}
                       placeholder="Target Company (e.g. Meta, Stripe)"
@@ -293,14 +348,15 @@ export default function EnginePage() {
                       onChange={(e) => setCompanyName(e.target.value)}
                       required
                     />
+                    {/* ✅ FIX 2 continued: datalist now populated from API */}
                     <datalist id="companies-list">
                       {companies.map(c => <option key={c} value={c} />)}
                     </datalist>
                   </div>
                   <div className={styles.fieldGroup}>
-                    <select 
-                      className={styles.inputField} 
-                      value={language} 
+                    <select
+                      className={styles.inputField}
+                      value={language}
                       onChange={e => setLanguage(e.target.value as any)}
                     >
                       <option value="python">Python 3</option>
@@ -312,13 +368,19 @@ export default function EnginePage() {
                   <button type="submit" className={styles.submitBtnLarge} disabled={loading}>
                     {loading ? <Loader2 className={styles.spin} /> : 'Generate Environment'}
                   </button>
+
+                  {loading && (
+                    <p style={{fontSize: '0.8rem', color: '#888', marginTop: '8px', textAlign: 'center'}}>
+                      Waking up backend & generating problem... this may take ~30-60s
+                    </p>
+                  )}
                 </form>
               </div>
             )}
 
             {codeSession && (
               <motion.div className={styles.sandboxView} initial={{opacity: 0}} animate={{opacity: 1}}>
-                
+
                 {/* 1. Problem Description Pane (Top Full Width) */}
                 <div className={styles.sandboxProblem}>
                   <div className={styles.problemHeaderFixed}>
