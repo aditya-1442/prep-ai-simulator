@@ -12,17 +12,35 @@ def _parse_json(text: str) -> dict:
     """Robustly strips markdown fences and fixes common LLM JSON mistakes."""
     if isinstance(text, dict):
         return text  # Already parsed by LangChain
-    text = text.strip()
-    # Remove ```json ... ``` or ``` ... ``` wrappers
-    text = re.sub(r'^```(?:json)?\s*', '', text, flags=re.MULTILINE)
-    text = re.sub(r'\s*```\s*$', '', text, flags=re.MULTILINE)
-    # Fix unquoted percentages like: "match_score": 5%  →  "match_score": "5%"
-    text = re.sub(r':\s*(\d+)%', r': "\1%"', text)
-    # Find the outermost JSON object
-    match = re.search(r'\{.*\}', text, re.DOTALL)
-    if match:
-        text = match.group()
-    return json.loads(text)
+    
+    # 1. Basic Cleaning
+    cleaned_text = text.strip()
+    
+    # 2. Fix unquoted percentages (e.g., : 45% -> : "45%")
+    # Matches both : 45% and :45%
+    cleaned_text = re.sub(r':\s*(\d+)\s*%', r': "\1%"', cleaned_text)
+    
+    # 3. Extract the JSON object using the first { and last }
+    start = cleaned_text.find('{')
+    end = cleaned_text.rfind('}')
+    
+    if start != -1 and end != -1:
+        json_candidate = cleaned_text[start:end+1]
+    else:
+        # Fallback: just strip markdown fences and hope for the best
+        json_candidate = re.sub(r'^```(?:json)?\s*', '', cleaned_text, flags=re.MULTILINE)
+        json_candidate = re.sub(r'\s*```\s*$', '', json_candidate, flags=re.MULTILINE)
+
+    try:
+        return json.loads(json_candidate)
+    except json.JSONDecodeError:
+        # 4. Final attempt: Remove trailing commas before closing braces/brackets
+        json_candidate = re.sub(r',\s*([\]\}])', r'\1', json_candidate)
+        try:
+            return json.loads(json_candidate)
+        except json.JSONDecodeError as e:
+            # If it still fails, raise a helpful error that includes the source text
+            raise ValueError(f"Invalid json output: {text}") from e
 
 # Prompts are static, so we can keep them at module level
 question_prompt = PromptTemplate.from_template(
