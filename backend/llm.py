@@ -1,10 +1,28 @@
 import os
+import re
+import json
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
+from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
+
+def _parse_json(text: str) -> dict:
+    """Robustly strips markdown fences and fixes common LLM JSON mistakes."""
+    if isinstance(text, dict):
+        return text  # Already parsed by LangChain
+    text = text.strip()
+    # Remove ```json ... ``` or ``` ... ``` wrappers
+    text = re.sub(r'^```(?:json)?\s*', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\s*```\s*$', '', text, flags=re.MULTILINE)
+    # Fix unquoted percentages like: "match_score": 5%  →  "match_score": "5%"
+    text = re.sub(r':\s*(\d+)%', r': "\1%"', text)
+    # Find the outermost JSON object
+    match = re.search(r'\{.*\}', text, re.DOTALL)
+    if match:
+        text = match.group()
+    return json.loads(text)
 
 # Prompts are static, so we can keep them at module level
 question_prompt = PromptTemplate.from_template(
@@ -46,7 +64,7 @@ research_prompt = PromptTemplate.from_template(
     3. **Previously Asked Questions**: List specific non-LeetCode technical or behavioral questions from their recent interview cycles.
     4. **Interview Process Map**: Summarize the detailed rounds from OA to Bar Raiser/Final.
     
-    Strictly format the output as a valid JSON object. No preamble, no explanation. Just the JSON. 
+    CRITICAL: Respond with ONLY a raw JSON object. No markdown. No code fences. No explanation. Just the JSON.
     Keys must be:
     "positions": [strings],
     "leetcode_questions": [strings],
@@ -90,7 +108,9 @@ def generate_content(target_name: str, context: str, generation_type: str) -> an
     elif generation_type == "summary":
         chain = summary_prompt | llm | StrOutputParser()
     elif generation_type == "research":
-        chain = research_prompt | llm | JsonOutputParser()
+        chain = research_prompt | llm | StrOutputParser()
+        raw = chain.invoke({"target_name": target_name, "company_name": target_name, "context": context})
+        return _parse_json(raw)
     else:
         raise ValueError("Invalid generation type.")
         
@@ -119,11 +139,15 @@ resume_roast_prompt = PromptTemplate.from_template(
     
     Your job is to ROAST this resume. Be absolutely savage, sarcastic, and brutally honest. Speak in aggressive Hinglish (Hindi + English mix). Use phrases like "bhai ye kya bana rkha hai?", "bilkul bakwaas", "kya soch ke likha ye?", and "is se achha toh blank paper de dete". 
     
-    Provide the output STRICTLY as a JSON object with these keys:
-    "roast": A multi-paragraph, incredibly savage roast of their resume in Hinglish. Start with something like "Bhai ye kya bana rkha hai?" or similar disrespect.
-    "improvements": Actionable, specific point-by-point improvements they MUST make to even have a 1% chance. Use savage Hinglish for the descriptions.
-    "match_score": A percentage out of 100 on how well it matches the JD. Be very stingy with points. Provide just the number + '%'.
-    "missing_keywords": A list of up to 5 critical keywords missing.
+    CRITICAL: Respond with ONLY a raw JSON object. No markdown. No code fences. No preamble. Just valid JSON.
+    Required keys:
+    "roast": A multi-paragraph savage roast in Hinglish.
+    "improvements": An array of strings, each being a specific actionable improvement in savage Hinglish.
+    "match_score": A string like "45%" — MUST be a quoted string, not a bare number.
+    "missing_keywords": An array of up to 5 critical missing keyword strings.
+    
+    Example format (follow exactly):
+    {{"roast": "Bhai ye kya...", "improvements": ["Fix X", "Add Y"], "match_score": "30%", "missing_keywords": ["Docker", "Kubernetes"]}}
     """
 )
 
@@ -131,10 +155,14 @@ live_code_start_prompt = PromptTemplate.from_template(
     """You are a technical interviewer at {company_name}.
     Generate a realistic, medium-to-hard coding interview problem typical for this company.
     
-    Provide the output STRICTLY as a JSON object with three keys:
+    CRITICAL: Respond with ONLY a raw JSON object. No markdown. No code fences. No explanation. Just valid JSON.
+    Required keys:
     "title": The problem name (e.g. "Optimize Meeting Rooms")
     "description": The full markdown description of the problem, including examples and constraints.
     "starting_code": A boilerplate {language} function definition for them to start writing in.
+    
+    Example format:
+    {{"title": "Two Sum Variant", "description": "## Problem\\n...", "starting_code": "def solve(nums):\\n    pass"}}
     """
 )
 
@@ -175,29 +203,36 @@ live_code_judge_prompt = PromptTemplate.from_template(
     ```
     
     Mentally test their code against edge cases, standard inputs, and optimal time/space constraints.
-    Provide the output STRICTLY as a JSON object with these keys:
-    "status": "Passed" if it is optimal and correct, else "Failed".
-    "feedback": Very short, realistic human feedback in Hinglish (Hindi+English mix). Use 'Aap' for respect. (max 2 sentences). E.g.: "Logic looks solid, bahut badhiya kaam kiya aapne. Par space complexity optimize ki jaa sakti hai." or "Aree nahi, ye empty lists pe fail ho jayega. Ek baar edge cases check kijiye."
-    "follow_up": If "Passed" and Follow-ups Asked < 2, provide a 1-sentence follow-up constraint in English. Else leave empty string.
-    "is_final": True if Follow-ups Asked >= 2 and "Passed", else False. (If True, your feedback should just be a concluding summary like "Bahut badiya kaam kiya aapne, that's all the questions I have. Interview yahi khatam karte hain.")
+    
+    CRITICAL: Respond with ONLY a raw JSON object. No markdown. No code fences. Just valid JSON.
+    Required keys:
+    "status": "Passed" if optimal and correct, else "Failed".
+    "feedback": Short realistic Hinglish feedback using 'Aap' for respect. Max 2 sentences.
+    "follow_up": If "Passed" and followups_asked < 2, a 1-sentence follow-up constraint. Else empty string "".
+    "is_final": true if followups_asked >= 2 and "Passed", else false.
+    
+    Example format:
+    {{"status": "Passed", "feedback": "Bahut badhiya kaam kiya aapne.", "follow_up": "Now solve it in O(1) space.", "is_final": false}}
     """
 )
 
 def analyze_resume(resume_text: str, job_description: str) -> dict:
     llm = ChatGroq(model="llama-3.3-70b-versatile", groq_api_key=os.getenv("GROQ_API_KEY"))
-    chain = resume_roast_prompt | llm | JsonOutputParser()
-    return chain.invoke({
+    chain = resume_roast_prompt | llm | StrOutputParser()
+    raw = chain.invoke({
         "resume_text": resume_text,
         "job_description": job_description if job_description else "General Software Engineering Role"
     })
+    return _parse_json(raw)
 
 def start_live_code(company_name: str, language: str) -> dict:
     llm = ChatGroq(model="llama-3.3-70b-versatile", groq_api_key=os.getenv("GROQ_API_KEY"))
-    chain = live_code_start_prompt | llm | JsonOutputParser()
-    return chain.invoke({
+    chain = live_code_start_prompt | llm | StrOutputParser()
+    raw = chain.invoke({
         "company_name": company_name,
         "language": language
     })
+    return _parse_json(raw)
 
 def generate_live_code_reply(company_name: str, problem_title: str, problem_description: str, chat_history: str, current_code: str, language: str, user_message: str) -> str:
     llm = ChatGroq(model="llama-3.3-70b-versatile", groq_api_key=os.getenv("GROQ_API_KEY"))
@@ -214,11 +249,12 @@ def generate_live_code_reply(company_name: str, problem_title: str, problem_desc
 
 def judge_live_code(problem_title: str, problem_description: str, current_code: str, language: str, followups_asked: int) -> dict:
     llm = ChatGroq(model="llama-3.3-70b-versatile", groq_api_key=os.getenv("GROQ_API_KEY"))
-    chain = live_code_judge_prompt | llm | JsonOutputParser()
-    return chain.invoke({
+    chain = live_code_judge_prompt | llm | StrOutputParser()
+    raw = chain.invoke({
         "problem_title": problem_title,
         "problem_description": problem_description,
         "current_code": current_code,
         "language": language,
         "followups_asked": followups_asked
     })
+    return _parse_json(raw)
