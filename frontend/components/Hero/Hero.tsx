@@ -25,14 +25,14 @@ export default function Hero() {
 
   useEffect(() => {
     // Generate random styles only on the client side to prevent hydration mismatches
-    const styles = [...Array(12)].map(() => ({
+    const generatedStyles = [...Array(12)].map(() => ({
       left: `${Math.random() * 100}%`,
       animationDelay: `${Math.random() * 8}s`,
       animationDuration: `${6 + Math.random() * 6}s`,
       width: `${4 + Math.random() * 8}px`,
       height: `${4 + Math.random() * 8}px`,
     }))
-    setParticleStyles(styles)
+    setParticleStyles(generatedStyles)
   }, [])
 
   return (
