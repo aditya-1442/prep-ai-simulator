@@ -1,44 +1,44 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Globe, Youtube, FileText, Building2, Cpu, BookOpen, AlertTriangle, Terminal } from 'lucide-react'
+import { Terminal, AlertTriangle, Building2, Code2, BarChart2, Cpu } from 'lucide-react'
 import styles from './Features.module.css'
 
 const features = [
   {
-    icon: <Building2 size={26} />,
-    title: 'Company Deep-Dives',
-    description: 'Scrape any company website. Get interview questions tailored to their products, culture, and tech stack.',
+    icon: <Terminal size={26} />,
+    title: 'Live Code Sandbox',
+    description: 'Pick any top company and dive into a real-time coding round. An AI interviewer asks questions, reviews your code, and fires follow-ups — just like the actual interview.',
     color: '#6B0E22',
   },
   {
     icon: <AlertTriangle size={26} />,
     title: 'Savage Resume Roaster',
-    description: 'Upload your resume and get a brutal, honest analysis in Hinglish. No fluff, just the cold hard truth.',
+    description: 'Upload your resume (PDF/DOCX) and get a no-holds-barred Hinglish roast. Match scores, missing keywords, and brutal honest feedback to make it interview-ready.',
     color: '#A8253E',
   },
   {
-    icon: <Terminal size={26} />,
-    title: 'Live Code Sandbox',
-    description: 'Practice real-time coding interviews with an AI interviewer who pushes your logic and edge-case thinking.',
+    icon: <Building2 size={26} />,
+    title: 'Company Deep-Dives',
+    description: 'Research any company — from Google to startups. Get real LeetCode patterns, interview process breakdowns, compensation benchmarks, and previous interview questions.',
     color: '#C4384F',
   },
   {
-    icon: <Youtube size={26} />,
-    title: 'YouTube Transcripts',
-    description: 'Paste a YouTube URL and our AI extracts the full transcript, turning talks into focused study material.',
+    icon: <Code2 size={26} />,
+    title: 'Multi-Language Support',
+    description: 'Code in Python, JavaScript, Java, C++, or any language you prefer. The AI adapts its feedback and hints to your chosen language and stack.',
     color: '#8B1A2F',
   },
   {
-    icon: <FileText size={26} />,
-    title: 'Job Description Parser',
-    description: 'Upload a JD. Our AI identifies key competencies and generates relevant behavioral and technical questions.',
+    icon: <BarChart2 size={26} />,
+    title: 'Company Benchmarking',
+    description: 'Compare two companies side-by-side — interview difficulty, comp packages, culture, and engineering bar — so you can make the smartest career decision.',
     color: '#6B0E22',
   },
   {
-    icon: <BookOpen size={26} />,
-    title: 'One-Page Summaries',
-    description: 'Too busy to read everything? Get crisp, actionable one-pagers that capture everything that matters.',
+    icon: <Cpu size={26} />,
+    title: 'Gemini AI Powered',
+    description: "Google's Gemini model is the brain behind every interview, roast, and research session — providing deep, contextual, and up-to-date responses every time.",
     color: '#A8253E',
   },
 ]
@@ -74,7 +74,7 @@ export default function Features() {
             <span className="gradient-text">Prepare Like a Pro</span>
           </h2>
           <p className={styles.subtitle}>
-            PrepAI handles any source content so you can focus entirely on learning.
+            Live coding practice, resume roasting, and deep-dive company research — built for serious candidates.
           </p>
         </motion.div>
 

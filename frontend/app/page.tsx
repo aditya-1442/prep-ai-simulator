@@ -9,10 +9,10 @@ import { ArrowRight, CheckCircle2, Zap } from 'lucide-react'
 import styles from './page.module.css'
 
 const howItWorks = [
-  { step: '01', title: 'Paste Your URLs', desc: 'Add any combination of URLs — job postings, company pages, YouTube videos, articles.' },
-  { step: '02', title: 'Choose Output Type', desc: 'Want targeted interview questions? Or a crisp one-page summary? Pick your mode.' },
-  { step: '03', title: 'AI Does the Work', desc: 'Advanced AI models scrape, analyze, and synthesize the best prep material for you.' },
-  { step: '04', title: 'Walk In Prepared', desc: 'Review your questions and summaries, then walk into the interview with total confidence.' },
+  { step: '01', title: 'Research Your Company', desc: 'Search any company to get LeetCode patterns, interview rounds, comp benchmarks, and culture details.' },
+  { step: '02', title: 'Start a Live Coding Round', desc: 'Choose your company and language. An AI interviewer throws real problems at you and challenges your thinking.' },
+  { step: '03', title: 'Roast Your Resume', desc: 'Upload your CV and get a brutal Hinglish critique — match scores, missing keywords, zero sugarcoating.' },
+  { step: '04', title: 'Walk In Confident', desc: 'Repeat until you crush it. Track history, sharpen your code, and walk into any interview ready to dominate.' },
 ]
 
 export default function HomePage() {
@@ -34,10 +34,10 @@ export default function HomePage() {
           >
             <span className="badge">✦ Process</span>
             <h2 className={styles.sectionTitle}>
-              From URL to
+              From Zero to
               <span className="gradient-text"> Interview-Ready</span>
             </h2>
-            <p className={styles.sectionSubtitle}>Four simple steps. Zero fluff.</p>
+            <p className={styles.sectionSubtitle}>Four steps. Real practice. Total confidence.</p>
           </motion.div>
 
           <div className={styles.stepsGrid}>
@@ -79,12 +79,12 @@ export default function HomePage() {
               <div className={styles.ctaIcon}>
                 <Zap size={32} color="white" />
               </div>
-              <h2 className={styles.ctaTitle}>Ready to prepare smarter?</h2>
+              <h2 className={styles.ctaTitle}>Ready to ace your next interview?</h2>
               <p className={styles.ctaSubtitle}>
-                Start with any URL or Upload your Resume. No sign-up required. Results in seconds.
+                Pick a company, start coding, or upload your resume. No sign-up required. Results in seconds.
               </p>
               <div className={styles.ctaChecks}>
-                {['Free to use', 'No login needed', 'Powered by AI'].map((c, i) => (
+                {['Free to use', 'No login needed', 'Gemini Powered'].map((c, i) => (
                   <span key={i} className={styles.ctaCheck}>
                     <CheckCircle2 size={16} />
                     {c}
@@ -93,7 +93,7 @@ export default function HomePage() {
               </div>
               <Link href="/generate" className={styles.ctaButton}>
                 <Zap size={18} />
-                Start Generating Now
+                Start Mock Interview Now
                 <ArrowRight size={18} />
               </Link>
             </div>
@@ -107,7 +107,7 @@ export default function HomePage() {
           <div className={styles.footerInner}>
             <div className={styles.footerBrand}>
               <span className={styles.footerLogo}>PrepAI</span>
-              <p className={styles.footerTagline}>Ace every interview with AI precision.</p>
+              <p className={styles.footerTagline}>Live coding · Resume roasting · Company research.</p>
             </div>
             <div className={styles.footerLinks}>
               <Link href="/" className={styles.footerLink}>Home</Link>

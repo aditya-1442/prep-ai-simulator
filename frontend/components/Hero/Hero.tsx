@@ -8,16 +8,16 @@ import { ArrowRight, Sparkles, Brain, Zap, Star } from 'lucide-react'
 import styles from './Hero.module.css'
 
 const floatingCards = [
-  { icon: '🎯', label: 'Smart Questions', delay: 0 },
-  { icon: '📋', label: 'One-Page Briefs', delay: 0.4 },
-  { icon: '⚡', label: 'Instant Results', delay: 0.8 },
+  { icon: '💻', label: 'Live Code Sandbox', delay: 0 },
+  { icon: '🔥', label: 'Resume Roaster', delay: 0.4 },
+  { icon: '🏢', label: 'Company Research', delay: 0.8 },
 ]
 
 const stats = [
-  { value: '50K+', label: 'Questions Generated' },
+  { value: '200+', label: 'Companies Covered' },
   { value: '98%', label: 'User Satisfaction' },
-  { value: '<10s', label: 'Average Time' },
-  { value: '15+', label: 'Sources Supported' },
+  { value: '<5s', label: 'Problem Load Time' },
+  { value: '3', label: 'Core Modes' },
 ]
 
 export default function Hero() {
@@ -63,7 +63,7 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <Sparkles size={13} />
-          Advanced Interview Intelligence
+          AI-Powered Interview Simulator
           <span className={styles.badgeDot} />
           <Star size={11} fill="currentColor" />
           4.9/5
@@ -76,7 +76,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
         >
-          Ace Every Interview
+          Crack Any Tech Interview
           <br />
           <span className={styles.headlineAccent}>With AI Precision</span>
         </motion.h1>
@@ -88,8 +88,8 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
         >
-          Paste any URL — company page, job description, research paper, or YouTube video.
-          PrepAI distills it into targeted interview questions or a crisp one-page summary in seconds.
+          Simulate live coding rounds from top companies, get your resume brutally roasted,
+          and research exactly what your target company asks — all powered by Gemini AI.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -101,7 +101,7 @@ export default function Hero() {
         >
           <Link href="/generate" className="btn-primary">
             <Zap size={17} />
-            Generate Now — It&apos;s Free
+            Start Mock Interview — It&apos;s Free
             <ArrowRight size={16} />
           </Link>
           <Link href="/history" className="btn-secondary">
@@ -174,7 +174,7 @@ export default function Hero() {
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
         >
           <div className={styles.miniCardDot} style={{ background: '#22c55e' }} />
-          <span>Company Research</span>
+          <span>Live Code Sandbox</span>
         </motion.div>
         <motion.div
           className={`${styles.miniCard} ${styles.miniCard2}`}
@@ -182,7 +182,7 @@ export default function Hero() {
           transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
         >
           <div className={styles.miniCardDot} style={{ background: '#f59e0b' }} />
-          <span>YouTube Videos</span>
+          <span>Resume Roaster</span>
         </motion.div>
         <motion.div
           className={`${styles.miniCard} ${styles.miniCard3}`}
@@ -190,7 +190,7 @@ export default function Hero() {
           transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
         >
           <div className={styles.miniCardDot} style={{ background: '#6B0E22' }} />
-          <span>Job Descriptions</span>
+          <span>Company Research</span>
         </motion.div>
       </motion.div>
 
