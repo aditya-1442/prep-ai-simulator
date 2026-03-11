@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Globe, Youtube, FileText, Building2, Cpu, BookOpen } from 'lucide-react'
+import { Globe, Youtube, FileText, Building2, Cpu, BookOpen, AlertTriangle, Terminal } from 'lucide-react'
 import styles from './Features.module.css'
 
 const features = [
@@ -12,27 +12,27 @@ const features = [
     color: '#6B0E22',
   },
   {
+    icon: <AlertTriangle size={26} />,
+    title: 'Savage Resume Roaster',
+    description: 'Upload your resume and get a brutal, honest analysis in Hinglish. No fluff, just the cold hard truth.',
+    color: '#A8253E',
+  },
+  {
+    icon: <Terminal size={26} />,
+    title: 'Live Code Sandbox',
+    description: 'Practice real-time coding interviews with an AI interviewer who pushes your logic and edge-case thinking.',
+    color: '#C4384F',
+  },
+  {
     icon: <Youtube size={26} />,
     title: 'YouTube Transcripts',
-    description: 'Paste a YouTube URL and PrepAI extracts the full transcript, turning talks into focused study material.',
-    color: '#A8253E',
+    description: 'Paste a YouTube URL and our AI extracts the full transcript, turning talks into focused study material.',
+    color: '#8B1A2F',
   },
   {
     icon: <FileText size={26} />,
     title: 'Job Description Parser',
-    description: 'Upload or link a JD. Our AI identifies key competencies and generates relevant behavioral and technical questions.',
-    color: '#C4384F',
-  },
-  {
-    icon: <Globe size={26} />,
-    title: 'Any Web Article',
-    description: 'Research papers, blog posts, news articles — if it has a URL, PrepAI can study it for you.',
-    color: '#8B1A2F',
-  },
-  {
-    icon: <Cpu size={26} />,
-    title: 'Gemini 1.5 Powered',
-    description: "Google's latest large context model ensures deep comprehension across long documents without missing key details.",
+    description: 'Upload a JD. Our AI identifies key competencies and generates relevant behavioral and technical questions.',
     color: '#6B0E22',
   },
   {

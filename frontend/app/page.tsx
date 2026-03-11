@@ -11,14 +11,8 @@ import styles from './page.module.css'
 const howItWorks = [
   { step: '01', title: 'Paste Your URLs', desc: 'Add any combination of URLs — job postings, company pages, YouTube videos, articles.' },
   { step: '02', title: 'Choose Output Type', desc: 'Want targeted interview questions? Or a crisp one-page summary? Pick your mode.' },
-  { step: '03', title: 'AI Does the Work', desc: 'Gemini 1.5 scrapes, analyzes, and synthesizes the best prep material for you.' },
+  { step: '03', title: 'AI Does the Work', desc: 'Advanced AI models scrape, analyze, and synthesize the best prep material for you.' },
   { step: '04', title: 'Walk In Prepared', desc: 'Review your questions and summaries, then walk into the interview with total confidence.' },
-]
-
-const testimonials = [
-  { name: 'Priya M.', role: 'Software Engineer @ Google', text: 'PrepAI turned a 40-page company report into 20 razor-sharp questions in under 10 seconds. Absolutely wild.' },
-  { name: 'Rahul K.', role: 'Product Manager @ Stripe', text: 'I used PrepAI the night before my final round. The questions it generated were almost exactly what I was asked.' },
-  { name: 'Sara L.', role: 'Data Scientist @ Meta', text: 'The one-page summary feature is a game changer. I can brief myself on any company in 5 minutes.' },
 ]
 
 export default function HomePage() {
@@ -66,51 +60,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== TESTIMONIALS ===== */}
-      <section className={styles.testimonialsSection}>
-        <div className={styles.testimonialsBg} />
-        <div className="container">
-          <motion.div
-            className={styles.sectionHeader}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className={styles.badgeLight}>✦ Reviews</span>
-            <h2 className={styles.sectionTitleLight}>
-              Trusted by Top Candidates
-            </h2>
-          </motion.div>
-
-          <div className={styles.testimonialsGrid}>
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={i}
-                className={styles.testimonialCard}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.15 }}
-                whileHover={{ y: -6 }}
-              >
-                <div className={styles.stars}>{'★'.repeat(5)}</div>
-                <p className={styles.testimonialText}>&ldquo;{t.text}&rdquo;</p>
-                <div className={styles.testimonialAuthor}>
-                  <div className={styles.authorAvatar}>
-                    {t.name.charAt(0)}
-                  </div>
-                  <div>
-                    <span className={styles.authorName}>{t.name}</span>
-                    <span className={styles.authorRole}>{t.role}</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ===== CTA STRIP ===== */}
       <section className={styles.ctaSection}>
         <div className="container">
@@ -132,10 +81,10 @@ export default function HomePage() {
               </div>
               <h2 className={styles.ctaTitle}>Ready to prepare smarter?</h2>
               <p className={styles.ctaSubtitle}>
-                Start with any URL. No sign-up required. Results in seconds.
+                Start with any URL or Upload your Resume. No sign-up required. Results in seconds.
               </p>
               <div className={styles.ctaChecks}>
-                {['Free to use', 'No login needed', 'Powered by Gemini 1.5'].map((c, i) => (
+                {['Free to use', 'No login needed', 'Powered by AI'].map((c, i) => (
                   <span key={i} className={styles.ctaCheck}>
                     <CheckCircle2 size={16} />
                     {c}
@@ -167,7 +116,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className={styles.footerDivider} />
-          <p className={styles.footerCopy}>© 2026 PrepAI. Built with Gemini 1.5 & FastAPI.</p>
+          <p className={styles.footerCopy}>© 2026 PrepAI. Built for Excellence.</p>
         </div>
       </footer>
     </main>

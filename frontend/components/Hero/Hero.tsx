@@ -63,7 +63,7 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <Sparkles size={13} />
-          Powered by Google Gemini 1.5
+          Advanced Interview Intelligence
           <span className={styles.badgeDot} />
           <Star size={11} fill="currentColor" />
           4.9/5
