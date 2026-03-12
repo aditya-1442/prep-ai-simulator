@@ -1,5 +1,5 @@
 # PrepAI: Advanced Simulation Engine 🚀
-
+---<img width="1440" height="720" alt="Screenshot 2026-03-12 at 15 09 24" src="https://github.com/user-attachments/assets/9d109634-ec44-4577-b6a4-03aef7919e56" />
 PrepAI is a production-grade interview simulator built for engineers who want to practice in high-stakes environments. It moves past simple chat boxes to provide a full-screen, immersive IDE experience powered by **LLaMA 3.3 70B**.
 
 ## 🎯 What it does
@@ -18,7 +18,7 @@ PrepAI is a production-grade interview simulator built for engineers who want to
 *   **AI**: LLaMA 3.3 70B via Groq.
 *   **Parsers**: PyPDF2, python-docx for native CV analysis.
 
----
+
 
 ### 🚦 Quick Start
 1.  **Backend**: `cd backend && source venv/bin/activate && uvicorn main:app --reload`
